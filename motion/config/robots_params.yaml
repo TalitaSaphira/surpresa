@@ -1,0 +1,36 @@
+#Parameters for an holonomic robot (mecanum wheels)
+
+# Image description of parameters in images folder
+l: 0.235145 # 0.235145
+w: 0.12854 # 0.12854
+r: 0.050 # radius of the wheel
+
+# l: 0.03425
+# w: 0.15
+# r: 0.030
+
+# Control Parameters
+Kv: 0.1 # Speed_gain
+Krot: 0.50 # Speed_rot_gain
+tol_trans: 0.1 # Position_tolerance [m]
+tol_angle: 1 # Orientation_tolerance [Degrees]
+
+# Arena
+square_side : 1.0 # [m] 
+
+# Ros Parameters
+input_topic_name : "robot/input" 
+input_topic_msg_type : Float32MultiArray
+odometry_topic_name: "/robot_pose_ekf/odom_combined"
+# odometry_topic_msg_type : "PoseWithCovarianceStamped"
+# odometry_topic_name : "/gt"
+# odometry_topic_msg_type : Odometry
+
+# Vector Field Parameters
+beta : 1 
+closed_path_flag : False
+obstacles_pos : [] #[[1,1],[1,2]]
+obstacles_r : [] #[1.2,1.2]
+flag_follow_obstacle : False
+switch_dist_0 : 1.2
+epsilon : 0.5

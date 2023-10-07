@@ -1,0 +1,24 @@
+<launch>
+
+  <!--Run the node that will generate wheels odometry-->
+  <node pkg = "odometry" name = "wheel_odometry" type = "wheel_to_odometry.py" args="" output="screen">
+  </node> 
+
+  <!--Run the node that will fuse odometries
+  <include file="$(find robot_pose_ekf)/launch/robot_pose_ekf.launch">
+  </include> -->
+
+  <!--Run the node that will fuse odometries-->
+  <node pkg = "fuse_odom" name = "fuse_odom" type = "fuse_odom.py" args="" output="screen">
+  </node> 
+
+  <!--Run the node that will call joystick-->
+  <node pkg = "joy" name = "joy" type = "joy_node" args="" output="screen">
+  </node>
+
+  <!--Run the node that will teleoperate-->
+  <node pkg = "motion" name = "teleop" type = "teleop.py" args="" output="screen">
+    <rosparam command="load" file="$(find motion)/config/robots_params.yaml" />
+  </node>
+
+</launch>
