@@ -1,0 +1,36 @@
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/home/pi/open_ws/src/surpresa/odometry/fuse_odom/scripts/fuse_odom.py", line 3, in <module>
+  File "/home/pi/open_ws/src/surpresa/odometry/wheel_odometry/scripts/wheel_to_odometry.py", line 3, in <module>
+Traceback (most recent call last):
+  File "/home/pi/open_ws/src/surpresa/motion/scripts/teleop.py", line 13, in <module>
+    import tf
+    import tf
+  File "/opt/ros/melodic/lib/python2.7/dist-packages/tf/__init__.py", line 30, in <module>
+  File "/opt/ros/melodic/lib/python2.7/dist-packages/tf/__init__.py", line 30, in <module>
+    from tf2_ros import TransformException as Exception, ConnectivityException, LookupException, ExtrapolationException
+    import tf
+  File "/opt/ros/melodic/lib/python2.7/dist-packages/tf2_ros/__init__.py", line 38, in <module>
+    from tf2_ros import TransformException as Exception, ConnectivityException, LookupException, ExtrapolationException
+  File "/opt/ros/melodic/lib/python2.7/dist-packages/tf/__init__.py", line 30, in <module>
+  File "/opt/ros/melodic/lib/python2.7/dist-packages/tf2_ros/__init__.py", line 38, in <module>
+    from tf2_ros import TransformException as Exception, ConnectivityException, LookupException, ExtrapolationException
+    from tf2_py import *
+    from tf2_py import *
+  File "/opt/ros/melodic/lib/python2.7/dist-packages/tf2_ros/__init__.py", line 38, in <module>
+  File "/opt/ros/melodic/lib/python2.7/dist-packages/tf2_py/__init__.py", line 38, in <module>
+  File "/opt/ros/melodic/lib/python2.7/dist-packages/tf2_py/__init__.py", line 38, in <module>
+    from ._tf2 import *
+    from ._tf2 import *
+    from tf2_py import *
+ImportError: dynamic module does not define module export function (PyInit__tf2)
+ImportError: dynamic module does not define module export function (PyInit__tf2)
+  File "/opt/ros/melodic/lib/python2.7/dist-packages/tf2_py/__init__.py", line 38, in <module>
+    from ._tf2 import *
+ImportError: dynamic module does not define module export function (PyInit__tf2)
+[wheel_odometry-1] process has died [pid 2119, exit code 1, cmd /home/pi/open_ws/src/surpresa/odometry/wheel_odometry/scripts/wheel_to_odometry.py __name:=wheel_odometry __log:=/home/pi/.ros/log/fa6c3d36-67a5-11ee-a7d8-b827eb0a1e3c/wheel_odometry-1.log].
+log file: /home/pi/.ros/log/fa6c3d36-67a5-11ee-a7d8-b827eb0a1e3c/wheel_odometry-1*.log
+[fuse_odom-2] process has died [pid 2120, exit code 1, cmd /home/pi/open_ws/src/surpresa/odometry/fuse_odom/scripts/fuse_odom.py __name:=fuse_odom __log:=/home/pi/.ros/log/fa6c3d36-67a5-11ee-a7d8-b827eb0a1e3c/fuse_odom-2.log].
+log file: /home/pi/.ros/log/fa6c3d36-67a5-11ee-a7d8-b827eb0a1e3c/fuse_odom-2*.log
+[teleop-4] process has died [pid 2122, exit code 1, cmd /home/pi/open_ws/src/surpresa/motion/scripts/teleop.py __name:=teleop __log:=/home/pi/.ros/log/fa6c3d36-67a5-11ee-a7d8-b827eb0a1e3c/teleop-4.log].
+log file: /home/pi/.ros/log/fa6c3d36-67a5-11ee-a7d8-b827eb0a1e3c/teleop-4*.log
