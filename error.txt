@@ -35,7 +35,6 @@ class WheelOdometry:
 
     def read_params(self):
         # Obtain the parameters
-        # try:
         self.l = float(rospy.get_param("~l", 1.0))
         self.w = float(rospy.get_param("~w", 1.0))
         self.r = float(rospy.get_param("~r", 1.0))
@@ -44,87 +43,60 @@ class WheelOdometry:
 
     def odom_callback(self, msg):
         aux = [msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w]
-
-        # Calculate odometry based on wheels velocities vector u
         self.quaternion_imu = np.array(aux)
 
     def velocity_callback(self, msg):
-        # Calculate odometry based on wheels velocities vector u
         self.u = np.array(msg.data)
-
-        # Estimate time step
         time_now = rospy.Time.now().to_sec()
-        self.time_step = time_now - self.time_last  # MELECA pode ser q o primeiro seja comicamente grande
+        self.time_step = time_now - self.time_last
         self.time_last = time_now
 
     def run(self):
         rate = rospy.Rate(self.freq)
-
-        # Wait a bit
         rate.sleep()
 
         while not rospy.is_shutdown():
-            # Direct Cinematics
             M = [[1, 1, 1, 1], [-1, 1, -1, 1], [-1 / (self.l + self.w), 1 / (self.l + self.w), 1 / (self.l + self.w),
                                               -1 / (self.l + self.w)]]
             [x_dot_b, y_dot_b, theta_dot] = (self.r / 4) * (np.dot(M, self.u))
 
-            #rot_bw = R.from_quat(self.quaternion_imu)
-            # Supondo que self.quaternion_imu seja um quaternion no formato [x, y, z, w]
-            quaternion_x = self.quaternion_imu[0]
-            quaternion_y = self.quaternion_imu[1]
-            quaternion_z = self.quaternion_imu[2]
-            quaternion_w = self.quaternion_imu[3]
+            quaternion_x, quaternion_y, quaternion_z, quaternion_w = self.quaternion_imu
 
-            # Converter o quaternion em uma matriz de rotação usando numpy
             rotation_matrix = np.array([
                 [1 - 2*quaternion_y**2 - 2*quaternion_z**2, 2*quaternion_x*quaternion_y - 2*quaternion_z*quaternion_w, 2*quaternion_x*quaternion_z + 2*quaternion_y*quaternion_w],
                 [2*quaternion_x*quaternion_y + 2*quaternion_z*quaternion_w, 1 - 2*quaternion_x**2 - 2*quaternion_z**2, 2*quaternion_y*quaternion_z - 2*quaternion_x*quaternion_w],
                 [2*quaternion_x*quaternion_z - 2*quaternion_y*quaternion_w, 2*quaternion_y*quaternion_z + 2*quaternion_x*quaternion_w, 1 - 2*quaternion_x**2 - 2*quaternion_y**2]
             ])
 
-            # Supondo que x_dot_b e y_dot_b sejam os componentes do vetor que você quer rotacionar
-            x_dot_b = 1.0  # substitua pelo valor real de x_dot_b
-            y_dot_b = 1.0  # substitua pelo valor real de y_dot_b
+            x_dot_b = 1.0  # Substitua pelo valor real de x_dot_b
+            y_dot_b = 1.0  # Substitua pelo valor real de y_dot_b
 
-            # Aplicar a rotação ao vetor [x_dot_b, y_dot_b, 0.0]
             rotated_vector = np.dot(rotation_matrix, np.array([x_dot_b, y_dot_b, 0.0]))
 
-            # Agora rotated_vector contém os componentes x, y, z do vetor após a rotação
-            x_dot = rotated_vector[0]
-            y_dot = rotated_vector[1]
-            z_dot = rotated_vector[2]
+            x_dot, y_dot, z_dot = rotated_vector[0], rotated_vector[1], rotated_vector[2]
 
-            # Apply translation
             self.x += x_dot * self.time_step
             self.y += y_dot * self.time_step
 
-            rot_dot = R.from_euler('x', theta_dot * self.time_step)
-            rot = R.from_quat(self.quaternion_imu)
-
-            # Apply rotation
-            rot_new = rot_dot * rot
-            self.quaternion = rot_new.as_quat()
-
-            # Create an Odometry message and publish it
+            # Criar a mensagem Odometry e publicá-la
             odom_msg = Odometry()
             odom_msg.header.stamp = rospy.Time.now()
             odom_msg.header.frame_id = "wheel_odom"
             odom_msg.child_frame_id = "base_footprint"
 
-            # Set the position
+            # Definir a posição
             odom_msg.pose.pose.position.x = self.x
             odom_msg.pose.pose.position.y = self.y
             odom_msg.pose.pose.position.z = 0.0
 
-            # Convert theta to quaternion and set the orientation
+            # Converter theta para quaternion e definir a orientação
             odom_msg.pose.pose.orientation.w = self.quaternion[0]
             odom_msg.pose.pose.orientation.x = self.quaternion[1]
             odom_msg.pose.pose.orientation.y = self.quaternion[2]
             odom_msg.pose.pose.orientation.z = self.quaternion[3]
 
-            # Set the twist (velocity) information
-            odom_msg.twist.twist.linear.x = 0.0  # MELECA pode ser q tenha q publicar ai seria o x_dot*time_step etc
+            # Configurar as informações de velocidade (twist)
+            odom_msg.twist.twist.linear.x = 0.0
             odom_msg.twist.twist.angular.z = 0.0
 
             odom_msg.pose.covariance = [0.210, 9.6136e-05, 6.8828e-05, 0, 0, 0,
@@ -132,9 +104,9 @@ class WheelOdometry:
                                         6.8828e-05, 5.5846e-05, 8.4270e-04, 0, 0, 0,
                                         0, 0, 0, 99999, 0, 0,
                                         0, 0, 0, 0, 99999, 0,
-                                        0, 0, 0, 0, 0, 99999]  # MELECA kkkk
+                                        0, 0, 0, 0, 0, 99999]
 
-            # Publish the odometry message
+            # Publicar a mensagem odometry
             self.wheel_odom_pub.publish(odom_msg)
 
             rate.sleep()
