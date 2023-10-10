@@ -1,18 +1,21 @@
-INFO: cannot create a symlink to latest log directory: [Errno 2] No such file or directory: '/home/pi/.ros/log/latest'
-Traceback (most recent call last):
-  File "/home/pi/open_ws/src/surpresa/motion/scripts/teleop.py", line 15, in <module>
-    from Navigator_class import Navigation_class
-  File "/home/pi/open_ws/src/surpresa/motion/scripts/Navigator_class.py", line 218
-    u.data = (1/self.r) * (M @ v)
-                             ^
-SyntaxError: invalid syntax
-[teleop-4] process has died [pid 4715, exit code 1, cmd /home/pi/open_ws/src/surpresa/motion/scripts/teleop.py __name:=teleop __log:=/home/pi/.ros/log/fa6c3d36-67a5-11ee-a7d8-b827eb0a1e3c/teleop-4.log].
-log file: /home/pi/.ros/log/fa6c3d36-67a5-11ee-a7d8-b827eb0a1e3c/teleop-4*.log
-Traceback (most recent call last):
-  File "/home/pi/open_ws/src/surpresa/odometry/wheel_odometry/scripts/wheel_to_odometry.py", line 120, in <module>
-    odometry.run()
-  File "/home/pi/open_ws/src/surpresa/odometry/wheel_odometry/scripts/wheel_to_odometry.py", line 70, in run
-    rot_bw = R.from_quat(self.quaternion_imu)
-NameError: global name 'R' is not defined
-[wheel_odometry-1] process has died [pid 4712, exit code 1, cmd /home/pi/open_ws/src/surpresa/odometry/wheel_odometry/scripts/wheel_to_odometry.py __name:=wheel_odometry __log:=/home/pi/.ros/log/fa6c3d36-67a5-11ee-a7d8-b827eb0a1e3c/wheel_odometry-1.log].
-log file: /home/pi/.ros/log/fa6c3d36-67a5-11ee-a7d8-b827eb0a1e3c/wheel_odometry-1*.log
+# Supondo que self.quaternion_imu seja um quaternion no formato [x, y, z, w]
+quaternion = np.array([self.quaternion_imu.x, self.quaternion_imu.y, self.quaternion_imu.z, self.quaternion_imu.w])
+
+# Converter o quaternion em uma matriz de rotação usando numpy
+rotation_matrix = np.array([
+    [1 - 2*quaternion[1]**2 - 2*quaternion[2]**2, 2*quaternion[0]*quaternion[1] - 2*quaternion[2]*quaternion[3], 2*quaternion[0]*quaternion[2] + 2*quaternion[1]*quaternion[3]],
+    [2*quaternion[0]*quaternion[1] + 2*quaternion[2]*quaternion[3], 1 - 2*quaternion[0]**2 - 2*quaternion[2]**2, 2*quaternion[1]*quaternion[2] - 2*quaternion[0]*quaternion[3]],
+    [2*quaternion[0]*quaternion[2] - 2*quaternion[1]*quaternion[3], 2*quaternion[1]*quaternion[2] + 2*quaternion[0]*quaternion[3], 1 - 2*quaternion[0]**2 - 2*quaternion[1]**2]
+])
+
+# Supondo que x_dot_b e y_dot_b sejam os componentes do vetor que você quer rotacionar
+x_dot_b = 1.0  # substitua pelo valor real de x_dot_b
+y_dot_b = 1.0  # substitua pelo valor real de y_dot_b
+
+# Aplicar a rotação ao vetor [x_dot_b, y_dot_b, 0.0]
+rotated_vector = np.dot(rotation_matrix, np.array([x_dot_b, y_dot_b, 0.0]))
+
+# Agora rotated_vector contém os componentes x, y, z do vetor após a rotação
+x_dot = rotated_vector[0]
+y_dot = rotated_vector[1]
+z_dot = rotated_vector[2]
