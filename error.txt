@@ -38,38 +38,33 @@ class Navigation_class:
         self.odom_sub = rospy.Subscriber(self.odometry_topic_name, PoseWithCovarianceStamped, self.pose_cb)
         self.inputs_pub = rospy.Publisher(self.input_topic_name, Float32MultiArray, queue_size=10)
 
-    # ... (código anterior)
+    def read_params(self):
+        # Obtain the parameters
+        # Robot
+        self.l = float(rospy.get_param("~l", 0.235145))
+        self.w = float(rospy.get_param("~w", 0.12854)) 
+        self.r = float(rospy.get_param("~r", 0.50))    
+        # Control Parameters
+        self.Kv = float(rospy.get_param("~speed_gain", 0.10))   
+        self.Krot = float(rospy.get_param("~speed_rot_gain", 0.50))  
+        self.tol_trans = float(rospy.get_param("~position_tolerance", 0.1)) 
+        self.tol_angle = float(rospy.get_param("~orientation_tolerance", 1))  
+        # Arena
+        self.square_side = float(rospy.get_param("~square_side", 1.0)) 
+        # Topics
+        self.input_topic_name = (rospy.get_param("~input_topic_name", "robot/input")) 
+        self.input_topic_msg_type = (rospy.get_param("~input_topic_msg_type", "Float32MultiArray")) 
+        self.odometry_topic_name = (rospy.get_param("~odometry_topic_name", "gt")) 
+        self.odometry_topic_msg_type = (rospy.get_param("~odometry_topic_msg_type", "Odometry")) 
+        self.path_topic_name = (rospy.get_param("~path_topic_name", "path")) 
+        # Vector Field Parameters
+        self.beta = int(rospy.get_param("~beta", 1)) 
+        self.closed_path_flag = False
+        self.obstacles_pos = [] #[[1,1],[1,2]]
+        self.obstacles_r = [] #[1.2,1.2]
+        self.flag_follow_obstacle = False
+        self.switch_dist_0 = 1.2
+        self.epsilon = 0.5
 
-    def set_path(self, path):
-        # tratamento dos dados de caminho a*
-        for ponto in path:
-            ponto[0] = self.square_side * (6 - ponto[0])
-            ponto[1] = self.square_side * (ponto[1] - 1)
+    # Restante do código...
 
-        x_coords, y_coords = zip(*path)
-
-        distancia_maxima = 0.1
-        numero_de_pontos_interpolados = int(np.sum(np.sqrt(np.diff(x_coords) ** 2 + np.diff(y_coords) ** 2) / distancia_maxima)) + 1
-
-        indices_interpolados = np.linspace(0, len(x_coords) - 1, numero_de_pontos_interpolados)
-        x_interpolados = np.interp(indices_interpolados, np.arange(len(x_coords)), x_coords)
-        y_interpolados = np.interp(indices_interpolados, np.arange(len(y_coords)), y_coords)
-
-        self.C = [y_interpolados, x_interpolados]  # Inverti x e y aqui para corresponder ao código original
-
-    # ... (código anterior)
-
-    def follow_field(self):
-        self.desired_point_w = [self.C[1][-1], self.C[0][-1]]  # Inverti x e y aqui para corresponder ao código original
-        self.dist = np.sqrt((self.pos[0] - self.desired_point_w[0]) ** 2 + (self.pos[1] - self.desired_point_w[1]) ** 2)
-
-        while (self.dist > self.tol_trans):
-            vetor_w = self.field_from_points()
-
-            rot_wb = R.from_quat(self.quaternion).inv()
-            vetor_b = rot_wb.apply(np.array([vetor_w[0], vetor_w[1], 0.0]))
-
-            self.setMovement(vetor_b, 0)
-            self.dist = np.sqrt((self.pos[0] - self.desired_point_w[0]) ** 2 + (self.pos[1] - self.desired_point_w[1]) ** 2)
-
-        self.setMovement([0.0, 0.0], 0)
