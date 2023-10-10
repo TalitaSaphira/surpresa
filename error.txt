@@ -1,4 +1,7 @@
-  File "/home/pi/open_ws/src/surpresa/odometry/wheel_odometry/scripts/wheel_to_odometry.py", line 74
-SyntaxError: Non-ASCII character '\xc3' in file /home/pi/open_ws/src/surpresa/odometry/wheel_odometry/scripts/wheel_to_odometry.py on line 74, but no encoding declared; see http://python.org/dev/peps/pep-0263/ for details
-[wheel_odometry-1] process has died [pid 5759, exit code 1, cmd /home/pi/open_ws/src/surpresa/odometry/wheel_odometry/scripts/wheel_to_odometry.py __name:=wheel_odometry __log:=/home/pi/.ros/log/fa6c3d36-67a5-11ee-a7d8-b827eb0a1e3c/wheel_odometry-1.log].
-log file: /home/pi/.ros/log/fa6c3d36-67a5-11ee-a7d8-b827eb0a1e3c/wheel_odometry-1*.log
+Traceback (most recent call last):
+  File "/home/pi/open_ws/src/surpresa/odometry/wheel_odometry/scripts/wheel_to_odometry.py", line 142, in <module>
+    odometry.run()
+  File "/home/pi/open_ws/src/surpresa/odometry/wheel_odometry/scripts/wheel_to_odometry.py", line 74, in run
+    quaternion = np.array([self.quaternion_imu.x, self.quaternion_imu.y, self.quaternion_imu.z, self.quaternion_imu.w])
+AttributeError: 'numpy.ndarray' object has no attribute 'x'
+
