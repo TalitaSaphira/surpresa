@@ -238,9 +238,20 @@ class Navigation_class:
                 
         self.setMovement([0.0,0.0], 0)
     
+    def set_quaternion(self, quaternion):
+        # Verifique se o quaternion é válido
+        if np.linalg.norm(quaternion) > 0:
+            self.quaternion = quaternion
+        else:
+            # Se o quaternion não for válido, defina um valor padrão ou trate o erro conforme necessário
+            print("Quaternions inválidos. Usando quaternion padrão.")
+            self.quaternion = np.array([1, 0, 0, 0])  # Quaternion padrão
+    
     def rotate_to_this(self, yaw):
         # Muda orientacao do robo para yaw (referencial do mundo)
         rot = R.from_quat(self.quaternion)
+
+        self.set_quaternion()  # Atualize o quaternion
 
         curr_ang = rot.as_euler('zxy', degrees=True)[0]
         if curr_ang < 0:

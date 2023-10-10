@@ -1,0 +1,13 @@
+<launch>
+  <!-- Include node1.launch -->
+  <include file="$(find motion)/launch/mission.launch"/>
+
+  <!-- Include node2.launch -->
+  <include file="$(find path_planning)/launch/path_planning.launch"/>
+
+  <!-- Include node3.launch -->
+  <include file="$(find vision)/launch/vision.launch"/>
+
+  <!-- Include node4.launch -->
+  <include file="$(find arduino)/launch/arduino.launch"/>
+</launch>

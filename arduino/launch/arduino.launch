@@ -1,0 +1,5 @@
+<launch>
+  <node name="communication_node" pkg="arduino" type="communication.py" output="screen">
+  </node>
+
+</launch>

@@ -1,0 +1,7 @@
+<launch>
+  <node name="calcula_rota_node" pkg="path_planning" type="rota_node" output="screen">
+  </node>
+
+  <node name="movimentation_main_node" pkg="path_planning" type="movimentation_main_node" output="screen">
+  </node>
+</launch>

@@ -8,7 +8,7 @@ import cv2 as cv
 import time
 
 # Nome do arquivo de vídeo ou dispositivo de captura (0 para câmera padrão)
-filename = 2
+filename = 0
 cap = cv.VideoCapture(filename)
 
 start_time = time.time()

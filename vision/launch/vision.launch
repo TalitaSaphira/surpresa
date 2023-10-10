@@ -1,0 +1,8 @@
+<launch>
+  <node name="green_finder_node" pkg="vision" type="green_corner_tracker_ROS.py" args="" output="screen">
+  </node>
+
+  <node name="line_counter_node" pkg="vision" type="horizontal_lines_ROS.py" args="" output="screen">
+  </node>
+
+</launch>
