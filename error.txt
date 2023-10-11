@@ -1,33 +1,52 @@
-import numpy as np
+// Substitua esses arrays pelos seus próprios valores de quaternions
+float quaternions[4][N] = {
+    {q1_1, q1_2, ..., q1_N},  // Quaternion 1: {w, x, y, z}
+    {q2_1, q2_2, ..., q2_N},  // Quaternion 2: {w, x, y, z}
+    {q3_1, q3_2, ..., q3_N},  // Quaternion 3: {w, x, y, z}
+    {q4_1, q4_2, ..., q4_N}   // Quaternion 4: {w, x, y, z}
+};
 
-class Navigation_class:
-    # ... (seu código anterior aqui)
+int N = 10;  // Número de observações (quaternions)
 
-    def get_yaw_from_quaternion(self):
-        # Converte o quaternion para yaw em graus
-        q = self.quaternion
-        yaw = np.arctan2(2 * (q[3] * q[2] + q[0] * q[1]), 1 - 2 * (q[1]**2 + q[2]**2))
-        return np.degrees(yaw)
+void setup() {
+  Serial.begin(9600);
+  
+  // Calcula a média dos quaternions
+  float mean_quaternion[4] = {0};
+  for (int i = 0; i < N; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      mean_quaternion[j] += quaternions[j][i];
+    }
+  }
+  for (int j = 0; j < 4; ++j) {
+    mean_quaternion[j] /= N;
+  }
 
-    def rotate_to_this(self, yaw):
-        # Muda orientacao do robo para yaw (referencial do mundo)
-        current_yaw = self.get_yaw_from_quaternion()
-        self.dist_ang = np.abs(current_yaw - yaw)
+  // Calcula a covariância
+  float covariance_matrix[4][4] = {0};
+  for (int i = 0; i < N; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      for (int k = 0; k < 4; ++k) {
+        covariance_matrix[j][k] += (quaternions[j][i] - mean_quaternion[j]) * (quaternions[k][i] - mean_quaternion[k]);
+      }
+    }
+  }
+  for (int j = 0; j < 4; ++j) {
+    for (int k = 0; k < 4; ++k) {
+      covariance_matrix[j][k] /= N;
+    }
+  }
 
-        while self.dist_ang > self.tol_angle:
-            current_yaw = self.get_yaw_from_quaternion()
-            self.dist_ang = np.abs(current_yaw - yaw)
+  // Imprime a matriz de covariância
+  for (int j = 0; j < 4; ++j) {
+    for (int k = 0; k < 4; ++k) {
+      Serial.print(covariance_matrix[j][k], 6);
+      Serial.print("\t");
+    }
+    Serial.println();
+  }
+}
 
-            # Decida a direção de rotação mais curta
-            if current_yaw > yaw:
-                if self.dist_ang > 180:
-                    self.setMovement([0.0, 0.0], -self.Krot)
-                else:
-                    self.setMovement([0.0, 0.0], self.Krot)
-            else:
-                if self.dist_ang > 180:
-                    self.setMovement([0.0, 0.0], self.Krot)
-                else:
-                    self.setMovement([0.0, 0.0], -self.Krot)
-
-        self.setMovement([0.0, 0.0], 0)
+void loop() {
+  // O código principal está no setup(), não há necessidade de loop neste caso
+}
