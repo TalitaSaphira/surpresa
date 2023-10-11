@@ -1,34 +1,33 @@
 import numpy as np
 
 class Navigation_class:
-    # ... (seu código anterior)
+    # ... (seu código anterior aqui)
 
-    def quaternion_to_euler(self, quat):
-        # Converte um quaternion para ângulos de Euler em graus
-        x, y, z, w = quat
-        roll = np.arctan2(2 * (w*x + y*z), 1 - 2*(x**2 + y**2))
-        pitch = np.arcsin(2 * (w*y - z*x))
-        yaw = np.arctan2(2 * (w*z + x*y), 1 - 2*(y**2 + z**2))
+    def get_yaw_from_quaternion(self):
+        # Converte o quaternion para yaw em graus
+        q = self.quaternion
+        yaw = np.arctan2(2 * (q[3] * q[2] + q[0] * q[1]), 1 - 2 * (q[1]**2 + q[2]**2))
+        return np.degrees(yaw)
 
-        # Convertendo de radianos para graus
-        roll = np.degrees(roll)
-        pitch = np.degrees(pitch)
-        yaw = np.degrees(yaw)
+    def rotate_to_this(self, yaw):
+        # Muda orientacao do robo para yaw (referencial do mundo)
+        current_yaw = self.get_yaw_from_quaternion()
+        self.dist_ang = np.abs(current_yaw - yaw)
 
-        return roll, pitch, yaw
+        while self.dist_ang > self.tol_angle:
+            current_yaw = self.get_yaw_from_quaternion()
+            self.dist_ang = np.abs(current_yaw - yaw)
 
-    def follow_field(self):
-        self.desired_point_w = [self.C[0][-1], self.C[1][-1]]
-        self.dist = np.sqrt((self.pos[0] - self.desired_point_w[0])**2 + (self.pos[1] - self.desired_point_w[1])**2)
-
-        while self.dist > self.tol_trans:
-            vetor_w = self.field_from_points()
-
-            # Converte o quaternion para ângulos de Euler
-            roll, pitch, yaw = self.quaternion_to_euler(self.quaternion)
-
-            # Sua lógica para o controle aqui, usando roll, pitch e yaw
-
-            self.dist = np.sqrt((self.pos[0] - self.desired_point_w[0])**2 + (self.pos[1] - self.desired_point_w[1])**2)
+            # Decida a direção de rotação mais curta
+            if current_yaw > yaw:
+                if self.dist_ang > 180:
+                    self.setMovement([0.0, 0.0], -self.Krot)
+                else:
+                    self.setMovement([0.0, 0.0], self.Krot)
+            else:
+                if self.dist_ang > 180:
+                    self.setMovement([0.0, 0.0], self.Krot)
+                else:
+                    self.setMovement([0.0, 0.0], -self.Krot)
 
         self.setMovement([0.0, 0.0], 0)
