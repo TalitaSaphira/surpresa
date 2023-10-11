@@ -1,52 +1,40 @@
-// Substitua esses arrays pelos seus próprios valores de quaternions
-float quaternions[4][N] = {
-    {q1_1, q1_2, ..., q1_N},  // Quaternion 1: {w, x, y, z}
-    {q2_1, q2_2, ..., q2_N},  // Quaternion 2: {w, x, y, z}
-    {q3_1, q3_2, ..., q3_N},  // Quaternion 3: {w, x, y, z}
-    {q4_1, q4_2, ..., q4_N}   // Quaternion 4: {w, x, y, z}
-};
+# Importe a biblioteca necessária
+import rospy
+from std_msgs.msg import Float32MultiArray
 
-int N = 10;  // Número de observações (quaternions)
+# Configurações PWM (fornecendo os valores mínimo e máximo de PWM)
+PWM_MIN = 40  # Valor PWM mínimo
+PWM_MAX = 255  # Valor PWM máximo
 
-void setup() {
-  Serial.begin(9600);
-  
-  // Calcula a média dos quaternions
-  float mean_quaternion[4] = {0};
-  for (int i = 0; i < N; ++i) {
-    for (int j = 0; j < 4; ++j) {
-      mean_quaternion[j] += quaternions[j][i];
-    }
-  }
-  for (int j = 0; j < 4; ++j) {
-    mean_quaternion[j] /= N;
-  }
+# Configurações de entrada (0valores mínimos e máximos de entrada do joystick)
+JOY_MIN = -3.0  # Valor mínimo do joystick
+JOY_MAX = 3.0   # Valor máximo do joystick
 
-  // Calcula a covariância
-  float covariance_matrix[4][4] = {0};
-  for (int i = 0; i < N; ++i) {
-    for (int j = 0; j < 4; ++j) {
-      for (int k = 0; k < 4; ++k) {
-        covariance_matrix[j][k] += (quaternions[j][i] - mean_quaternion[j]) * (quaternions[k][i] - mean_quaternion[k]);
-      }
-    }
-  }
-  for (int j = 0; j < 4; ++j) {
-    for (int k = 0; k < 4; ++k) {
-      covariance_matrix[j][k] /= N;
-    }
-  }
+# Tópico de entrada do joystick
+JOY_TOPIC = '/robot/input'
 
-  // Imprime a matriz de covariância
-  for (int j = 0; j < 4; ++j) {
-    for (int k = 0; k < 4; ++k) {
-      Serial.print(covariance_matrix[j][k], 6);
-      Serial.print("\t");
-    }
-    Serial.println();
-  }
-}
+# Tópico de saída para os valores PWM
+PWM_TOPIC = '/motor_pwm'
 
-void loop() {
-  // O código principal está no setup(), não há necessidade de loop neste caso
-}
+# Função de callback para o tópico do joystick
+def joy_callback(msg):
+    # Obtém os valores do joystick
+    joy_x, joy_y = msg.data[0], msg.data[1]
+
+    # Mapeia os valores do joystick para o intervalo de PWM
+    pwm_output = int((joy_x - JOY_MIN) / (JOY_MAX - JOY_MIN) * (PWM_MAX - PWM_MIN) + PWM_MIN)
+
+    # Publica os valores de PWM
+    pwm_publisher.publish(pwm_output)
+
+# Inicializa o nó ROS
+rospy.init_node('joystick_to_pwm_node')
+
+# Subscreve ao tópico do joystick
+rospy.Subscriber(JOY_TOPIC, Float32MultiArray, joy_callback)
+
+# Cria um publicador para os valores PWM
+pwm_publisher = rospy.Publisher(PWM_TOPIC, Int32, queue_size=10)
+
+# Mantenha o programa em execução
+rospy.spin()
